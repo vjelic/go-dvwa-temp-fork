@@ -58,6 +58,52 @@
               }
             },
             {
+              "id": "17664c2b-91cb-3ded-84db-37ed79774668",
+              "name": "Unencrypted HTTP Server Vulnerability",
+              "helpUri": "https://www.glog.ai/",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe \"Unencrypted HTTP Server Vulnerability\" in Go programming language refers to the risk associated with running an HTTP server without any encryption. This means that all data transmitted between the client and the server is sent in plain text, which can be intercepted and read by attackers. This vulnerability can lead to sensitive information disclosure, such as user credentials, personal details, or confidential business data.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to use HTTPS instead of HTTP. HTTPS is HTTP over SSL/TLS, which means that the data transmitted between the client and the server is encrypted and cannot be read by attackers even if intercepted.\n\n## Source Code Fix Recommendation\n\nTo fix this vulnerability in the provided code, you should use `http.ListenAndServeTLS` instead of `http.ListenAndServe`. Here is an example:\n\n```go\nerr = http.ListenAndServeTLS(addr, \"cert.pem\", \"key.pem\", sqhttp.Middleware(router))\n```\n\nIn this example, \"cert.pem\" is the server's certificate and \"key.pem\" is the server's private key. You should replace these with your actual certificate and private key.\n\n## Library Dependencies\n\nThe code example requires the following library dependencies:\n\n- The `net/http` package from the Go standard library\n- The `sqhttp` package, which is not part of the Go standard library and needs to be imported separately\n\n## References\n\n- [OWASP Transport Layer Protection Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html)\n- [CWE-319: Cleartext Transmission of Sensitive Information](https://cwe.mitre.org/data/definitions/319.html)"
+              },
+              "properties": {
+                "cwe": [
+                  {
+                    "id": "CWE-319",
+                    "url": "https://cwe.mitre.org/data/definitions/319.html"
+                  }
+                ],
+                "kind": "FAIL",
+                "security-severity": "5.0",
+                "tags": [
+                  "security",
+                  "CWE-319"
+                ]
+              }
+            },
+            {
+              "id": "3ea52041-f30f-3889-a5a9-9c1c30da096f",
+              "name": "Local Privilege Escalation Vulnerability due to Variable Path Resolution in os.Executable() Across Different Operating Systems",
+              "helpUri": "https://www.glog.ai/",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `os.Executable()` function in Go programming language is used to find the path name for the executable that started the current process. However, there can be a local privilege escalation vulnerability due to variable path resolution in `os.Executable()` across different operating systems. This vulnerability can allow an attacker to escalate their privileges on the system by manipulating the file system layout or timing.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to avoid using `os.Executable()` to determine the location of the application resources. Instead, use a reliable method to locate the resources, such as using absolute paths or paths relative to a known location.\n\n## Source Code Fix Recommendation\n\nInstead of using `os.Executable()` to determine the location of the template directory, you can use a constant path or a path relative to a known location. Here is an example:\n\n```go\nconst templateDir = \"/absolute/path/to/template\"\n```\n\nOr, if the template directory is in the same directory as the source code file:\n\n```go\n_, filename, _, _ := runtime.Caller(0)\ntemplateDir := filepath.Join(filepath.Dir(filename), \"template\")\n```\n\n## Library Dependencies\n\nThe code example requires the following library dependencies:\n\n- `os`\n- `log`\n- `filepath`\n- `runtime`\n\n## References\n\n- [CWE-276: Incorrect Default Permissions](https://cwe.mitre.org/data/definitions/276.html)\n\nPlease note that the links provided are active and accessible to anonymous users at the time of writing this report."
+              },
+              "properties": {
+                "cwe": [
+                  {
+                    "id": "CWE-269",
+                    "url": "https://cwe.mitre.org/data/definitions/269.html"
+                  }
+                ],
+                "kind": "FAIL",
+                "security-severity": "5.0",
+                "tags": [
+                  "security",
+                  "CWE-269"
+                ]
+              }
+            },
+            {
               "id": "6a4f213c-c990-3656-b3fd-1eec5d521bf0",
               "name": "\"File Replacement and Local Privilege Escalation Vulnerability due to os.Executable() Behaviour Variation Across Operating Systems\"",
               "helpUri": "https://www.glog.ai/",
@@ -82,6 +128,29 @@
                   "security",
                   "CWE-269",
                   "CWE-59"
+                ]
+              }
+            },
+            {
+              "id": "adb261fa-f93f-3df0-a4df-d133f633f9e0",
+              "name": "\"Command Injection Vulnerability due to Variable Argument in Shell Interpreter Invocation\"",
+              "helpUri": "https://www.glog.ai/",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nCommand Injection Vulnerability due to Variable Argument in Shell Interpreter Invocation is a security vulnerability that occurs when an application passes unsafe user-supplied data (forms, cookies, HTTP headers, etc.) to a system shell. In this case, the user-supplied data can contain shell meta-characters and can lead to arbitrary command execution.\n\nIn the Go programming language, this vulnerability can occur when using the `exec.CommandContext` function with user-supplied input. The function `exec.CommandContext` is used to execute shell commands. If an attacker can influence the `cmd` argument in the function, they can execute arbitrary commands on the system.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, avoid using shell commands with user-supplied input. If it's necessary to use shell commands, make sure to properly sanitize and validate user-supplied input. \n\n## Source Code Fix Recommendation\n\nInstead of passing the command as a string that gets parsed by a shell, you should provide the command and arguments as a slice of strings. Here's how you can modify the code:\n\n```go\ncmdName := \"ls\"\ncmdArgs := []string{\"-l\", \"-a\"}\ncmd := exec.CommandContext(ctx, cmdName, cmdArgs...)\noutput, err := cmd.CombinedOutput()\n```\n\nIn this example, `cmdName` is the command to be executed, and `cmdArgs` is a slice of strings containing the arguments. This way, the command doesn't get parsed by a shell and it's not possible to inject arbitrary commands.\n\n## Library Dependencies\n\nThe code example requires the following library:\n\n- \"os/exec\"\n\n## References\n\n- [OWASP Command Injection](https://owasp.org/www-community/attacks/Command_Injection)\n- [CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')](https://cwe.mitre.org/data/definitions/78.html)"
+              },
+              "properties": {
+                "cwe": [
+                  {
+                    "id": "CWE-78",
+                    "url": "https://cwe.mitre.org/data/definitions/78.html"
+                  }
+                ],
+                "kind": "FAIL",
+                "security-severity": "5.0",
+                "tags": [
+                  "security",
+                  "CWE-78"
                 ]
               }
             },
@@ -224,6 +293,41 @@
           }
         },
         {
+          "ruleId": "3ea52041-f30f-3889-a5a9-9c1c30da096f",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Local Privilege Escalation Vulnerability due to Variable Path Resolution in os.Executable() Across Different Operating Systems"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "server/main.go",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 17,
+                  "startColumn": 2,
+                  "endLine": 21,
+                  "endColumn": 61,
+                  "snippet": {
+                    "text": "\tbin, err := os.Executable()\n\tif err != nil {\n\t\tlog.Panic(\"could not get the executable filename:\", err)\n\t}\n\ttemplateDir := filepath.Join(filepath.Dir(bin), \"template\")"
+                  },
+                  "sourceLanguage": "go"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "glog-pfp-ruleFileLineCode/v1": "3feb059a449e4245c422733783397ae9cea1c058d9d4162ce93977bc18566d37",
+            "glog-pfp-ruleFileCode/v1": "41849d482f28f411ddfbdf603fd37c4a29257ac08b6d7523481b3b18e0a9352d"
+          },
+          "fingerprints": {
+            "glog-fp-ruleFileCode/v1": "41849d482f28f411ddfbdf603fd37c4a29257ac08b6d7523481b3b18e0a9352d"
+          }
+        },
+        {
           "ruleId": "d065b916-363a-334f-9cf9-1f16cad2b49d",
           "kind": "fail",
           "level": "warning",
@@ -256,6 +360,41 @@
           },
           "fingerprints": {
             "glog-fp-ruleFileCode/v1": "6592a1c21365e453ea3b232abf0c6c8ed1d080ae5e631677bad81aca2f225bef"
+          }
+        },
+        {
+          "ruleId": "17664c2b-91cb-3ded-84db-37ed79774668",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Unencrypted HTTP Server Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "server/main.go",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 27,
+                  "startColumn": 8,
+                  "endLine": 27,
+                  "endColumn": 60,
+                  "snippet": {
+                    "text": "\terr = http.ListenAndServe(addr, sqhttp.Middleware(router))"
+                  },
+                  "sourceLanguage": "go"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "glog-pfp-ruleFileLineCode/v1": "437b09f05c2df004f01d5694c4f8794c895d9b7bcf2924a3b2ff64fedf08329e",
+            "glog-pfp-ruleFileCode/v1": "7c8be5c378febf2ce43859cdfca5a5637e1d99a120f73de9e8f0259e2c1e418a"
+          },
+          "fingerprints": {
+            "glog-fp-ruleFileCode/v1": "7c8be5c378febf2ce43859cdfca5a5637e1d99a120f73de9e8f0259e2c1e418a"
           }
         },
         {
@@ -431,6 +570,41 @@
           },
           "fingerprints": {
             "glog-fp-ruleFileCode/v1": "93609308213c919b18b1608970bcd29e6ed00c6350a3161712a6dafd16c32fc4"
+          }
+        },
+        {
+          "ruleId": "adb261fa-f93f-3df0-a4df-d133f633f9e0",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "\"Command Injection Vulnerability due to Variable Argument in Shell Interpreter Invocation\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "vulnerable/system.go",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 9,
+                  "startColumn": 9,
+                  "endLine": 9,
+                  "endColumn": 50,
+                  "snippet": {
+                    "text": "\treturn exec.CommandContext(ctx, \"sh\", \"-c\", cmd).CombinedOutput()"
+                  },
+                  "sourceLanguage": "go"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "glog-pfp-ruleFileLineCode/v1": "a7512975379ce4b61eccdf86c03fd5999a77049d4731e8afc3d741a90e363d90",
+            "glog-pfp-ruleFileCode/v1": "bfaa7b41b8939f361d1b5e429c6d7cdfb0bedfb59927396afd371144af98b258"
+          },
+          "fingerprints": {
+            "glog-fp-ruleFileCode/v1": "bfaa7b41b8939f361d1b5e429c6d7cdfb0bedfb59927396afd371144af98b258"
           }
         }
       ],
