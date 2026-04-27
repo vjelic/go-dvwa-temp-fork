@@ -31,5 +31,6 @@ jobs:
           upload: 'true'
           client: 'test'
           env: 'dev'
+          ignore: 'template/js/vendor/**,template/Karma Shop-doc/**,template/js/gmaps.min.js,template/js/ion.rangeSlider.js,template/js/jquery.ajaxchimp.min.js,template/js/jquery.magnific-popup.min.js'
           github-token: ${{ secrets.PAT_TOKEN }}
           glog-token: ${{ secrets.GLOG_TOKEN }}
